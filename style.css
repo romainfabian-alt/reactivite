@@ -1,0 +1,138 @@
+:root {
+  --fond: #14171A;
+  --carte: #1C1F22;
+  --bordure: #2E3338;
+  --texte: #F2EFE9;
+  --texte-doux: #8B949B;
+  --cuivre: #B07D4F;
+  --danger: #E0322B;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--fond); color: var(--texte);
+  font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  overscroll-behavior: none;
+}
+
+/* Le rebond de Safari en plein exercice ferait bouger le stimulus. */
+body { position: fixed; width: 100%; overflow: hidden; }
+
+#racine { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+.page { padding: max(20px, env(safe-area-inset-top)) 24px 32px; max-width: 860px; margin: 0 auto; }
+
+.entete { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.entete h1 { font-size: 24px; margin: 0; flex: 1; font-weight: 600; }
+.entete img { width: 34px; height: 34px; }
+
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+
+.bouton {
+  background: var(--cuivre); color: #14161A; font-weight: 600;
+  border-radius: 12px; padding: 14px 20px; min-height: 52px;
+}
+.bouton.fantome { background: transparent; color: var(--texte); border: 1px solid var(--bordure); }
+.bouton.danger  { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+.bouton:active { opacity: .75; }
+
+.filtres { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.filtre {
+  border: 1px solid var(--bordure); color: var(--texte-doux);
+  border-radius: 999px; padding: 7px 16px; font-size: 14px;
+}
+.filtre[aria-pressed="true"] { background: var(--cuivre); color: #14161A; border-color: var(--cuivre); }
+
+.carte {
+  background: var(--carte); border: 1px solid var(--bordure); border-radius: 14px;
+  padding: 16px 18px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+.carte .infos { flex: 1; min-width: 0; }
+.carte .nom { font-size: 18px; font-weight: 600; }
+.carte .detail { font-size: 13px; color: var(--texte-doux); margin-top: 3px; }
+.carte .icone {
+  padding: 10px; font-size: 20px; color: var(--texte-doux);
+  min-width: 44px; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+.vide { color: var(--texte-doux); text-align: center; padding: 40px 0; }
+
+/* Réglages */
+.groupe { border: 1px solid var(--bordure); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+.groupe > summary {
+  padding: 14px 18px; font-weight: 600; cursor: pointer; list-style: none;
+  display: flex; justify-content: space-between;
+}
+.groupe > summary::-webkit-details-marker { display: none; }
+.groupe[open] > summary { border-bottom: 1px solid var(--bordure); }
+.groupe .contenu { padding: 6px 18px 16px; }
+
+.champ { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 11px 0; }
+.champ + .champ { border-top: 1px solid var(--bordure); }
+.champ label { color: var(--texte-doux); font-size: 15px; }
+.champ input[type="number"], .champ input[type="text"], .champ select {
+  background: var(--fond); color: var(--texte); border: 1px solid var(--bordure);
+  border-radius: 9px; padding: 10px 12px; min-width: 110px; font: inherit;
+}
+.champ input[type="checkbox"] { width: 26px; height: 26px; accent-color: var(--cuivre); }
+/* La case garde sa taille visuelle ; l'enveloppe porte la zone tactile
+   (44 points minimum) sans rien changer à l'apparence de la case elle-même. */
+.case-tactile {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px;
+}
+
+.jetons { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0; }
+.jeton {
+  border: 1px solid var(--bordure); border-radius: 10px; padding: 9px 14px;
+  color: var(--texte-doux); font-size: 14px;
+  min-width: 44px; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.jeton[aria-pressed="true"] { border-color: var(--cuivre); color: var(--texte); background: #23262A; }
+.pastille { width: 18px; height: 18px; border-radius: 50%; display: inline-block; vertical-align: -3px; margin-right: 7px; }
+
+.barre-bas {
+  position: sticky; bottom: 0; display: flex; gap: 10px;
+  padding: 14px 0 max(14px, env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, var(--fond) 30%);
+}
+.barre-bas .bouton { flex: 1; }
+
+.erreur { color: var(--danger); font-size: 14px; padding: 10px 0; }
+
+/* Exercice plein écran */
+.scene {
+  position: fixed; inset: 0; background: #000;
+  display: flex; align-items: center; justify-content: center;
+  transition: background-color 40ms linear;
+}
+.scene .stimulus { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.scene .stimulus svg { max-height: 90vh; max-width: 90vw; }
+.decompte { font-size: 22vh; font-weight: 700; color: var(--texte); }
+.repos { text-align: center; color: var(--texte); }
+.repos .restant { font-size: 18vh; font-weight: 700; line-height: 1; }
+.repos .suite { font-size: 20px; color: var(--texte-doux); margin-top: 12px; }
+
+.voile {
+  /* Opaque : à la pause, le patient ne doit plus rien avoir à traiter,
+     y compris deviner le stimulus et sa couleur en transparence. */
+  position: fixed; inset: 0; background: rgb(10, 12, 14);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  padding: 24px;
+}
+.voile .bouton { min-width: 280px; text-align: center; }
+.voile h2 { margin: 0 0 6px; font-size: 30px; }
+.voile .bilan { color: var(--texte-doux); margin-bottom: 14px; }
+
+/* Dernier recours de l'export : le kiné sélectionne et copie lui-même. */
+.secours-export {
+  width: 100%; max-width: 560px; max-height: 40vh;
+  background: var(--fond); color: var(--texte); border: 1px solid var(--bordure);
+  border-radius: 10px; padding: 12px; font: 13px/1.4 ui-monospace, "SFMono-Regular", Menlo, monospace;
+  resize: vertical;
+}
