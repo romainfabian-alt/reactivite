@@ -300,10 +300,35 @@
     return bouts.join(" · ");
   }
 
+  // La carte de l'accueil (refonte du 01/10/2026) : le mode en petites
+  // capitales, puis le contenu, le rythme et le volume chacun à sa place, là
+  // où resume() les met bout à bout sur une ligne.
+  function carte(e) {
+    var regle = { conflit: "conflit", distracteur: "distracteur", code: "code couleur" };
+    var mode = { directions: "Directions", couleurs: "Couleurs", mixte: "Mixte · " + regle[e.regle] }[e.mode];
+    var stop = e.stop && e.stop.actif;
+    if (stop) mode += " + stop";
+
+    var contenu = [];
+    if (utiliseDirections(e)) contenu.push(e.directions.length + " directions");
+    if (e.mode !== "directions") contenu.push(e.couleurs.length + " couleurs");
+    if (stop) contenu.push("stop " + e.stop.frequence + " %");
+
+    var rythme;
+    if (e.acceleration && e.acceleration.actif) rythme = "de " + sec(e.acceleration.debut) + " à " + sec(e.acceleration.fin) + " s";
+    else if (e.intervalle.type === "aleatoire") rythme = sec(e.intervalle.min) + " à " + sec(e.intervalle.max) + " s";
+    else rythme = "un stimulus toutes les " + sec(e.intervalle.valeur) + " s";
+
+    var unite = (e.fin.type === "duree") ? e.fin.duree + " s" : e.fin.stimuli + " stimuli";
+    var volume = e.series + (e.series > 1 ? " séries" : " série") + " × " + unite;
+
+    return { mode: mode, contenu: contenu.join(" · "), rythme: rythme, volume: volume };
+  }
+
   var Modele = {
     ANGLES: ANGLES, DIRECTIONS: DIRECTIONS,
     COULEURS: COULEURS, NOMS_COULEURS: NOMS_COULEURS,
-    oppose: oppose, defaut: defaut, valider: valider, resume: resume,
+    oppose: oppose, defaut: defaut, valider: valider, resume: resume, carte: carte,
     utiliseDirections: utiliseDirections, utiliseCouleurs: utiliseCouleurs
   };
   if (typeof module !== "undefined" && module.exports) module.exports = Modele;

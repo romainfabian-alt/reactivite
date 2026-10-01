@@ -1,7 +1,44 @@
 (function (global) {
   var Modele = global.Modele;
+  var Rendu = global.Rendu;
 
   var filtreActif = "tous";
+
+  // Le dernier exercice lancé porte un liseré cuivre (refonte du 01/10/2026).
+  // Simple confort : si le stockage refuse, la liste s'affiche sans liseré.
+  var CLE_DERNIER = "reactivite.dernier";
+  function dernierLance() {
+    try { return global.localStorage.getItem(CLE_DERNIER); } catch (e) { return null; }
+  }
+  function noterLance(id) {
+    try { global.localStorage.setItem(CLE_DERNIER, id); } catch (e) { /* sans liseré, tant pis */ }
+  }
+
+  // Icônes dessinées, jamais des caractères (✎, 🗑) dont le rendu varie.
+  var ICONES = {
+    crayon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
+    poubelle: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>',
+    jouer: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>'
+  };
+
+  // Aperçu du stimulus en tête de carte : on reconnaît l'exercice d'un coup
+  // d'oeil, avant de lire son nom.
+  function apercu(e) {
+    var hex = function (c) { return Rendu.fond(c); };
+    var quatre = function (avecFleches) {
+      return '<div class="apercu quatre">' + e.couleurs.slice(0, 4).map(function (c) {
+        var dir = avecFleches && e.code ? e.code[c] : null;
+        return '<span style="background:' + hex(c) + '">' + (dir ? Rendu.fleche(dir, "#FFFFFF", 70) : "") + "</span>";
+      }).join("") + "</div>";
+    };
+    if (e.mode === "couleurs") return quatre(false);
+    if (e.mode === "mixte" && e.regle === "code") return quatre(true);
+    var dir = e.directions.indexOf("haut") !== -1 ? (e.directions.length > 4 ? "haut-droite" : "haut") : e.directions[0];
+    var couleur = "#F2EFE9";
+    if (e.mode === "mixte" && e.regle === "conflit" && e.conflit) { dir = "droite"; couleur = hex(e.conflit.inverser); }
+    else if (e.mode === "mixte") { dir = "gauche"; couleur = hex(e.couleurs[e.couleurs.length > 2 ? 2 : 0]); }
+    return '<div class="apercu">' + Rendu.fleche(dir, couleur, 62) + "</div>";
+  }
 
   function afficher(racine, app) {
     var exercices;
@@ -15,11 +52,12 @@
     racine.innerHTML = "";
 
     var page = document.createElement("div");
-    page.className = "page";
+    page.className = "page accueil";
 
     var entete = document.createElement("div");
     entete.className = "entete";
-    entete.innerHTML = '<img src="assets/logo.svg" alt=""><h1>Réactivité</h1>';
+    entete.innerHTML = '<img src="assets/logo.svg" alt=""><h1>Réactivité</h1><span class="compte"></span><span class="espace"></span>';
+    entete.querySelector(".compte").textContent = exercices.length + (exercices.length > 1 ? " exercices" : " exercice");
     var plus = document.createElement("button");
     plus.className = "bouton";
     plus.textContent = "+ Nouvel exercice";
@@ -57,7 +95,11 @@
       page.appendChild(vide);
     }
 
-    visibles.forEach(function (e) { page.appendChild(carte(e, racine, app)); });
+    var grille = document.createElement("div");
+    grille.className = "grille-ex";
+    var dernier = dernierLance();
+    visibles.forEach(function (e) { grille.appendChild(carte(e, racine, app, e.id === dernier)); });
+    if (visibles.length) page.appendChild(grille);
 
     page.appendChild(outils(racine, app));
     racine.appendChild(page);
@@ -116,29 +158,43 @@
     return barre;
   }
 
-  function carte(e, racine, app) {
+  // Une carte par exercice (refonte du 01/10/2026) : l'aperçu du stimulus,
+  // le mode en petites capitales cuivre, le nom, le contenu et le rythme, puis
+  // la durée et le bouton de lancement. Toucher la carte lance l'exercice ;
+  // crayon et poubelle ne la lancent jamais.
+  function carte(e, racine, app, recente) {
     var c = document.createElement("div");
-    c.className = "carte";
+    c.className = "carte-ex" + (recente ? " recente" : "");
+    c.setAttribute("role", "button");
+    c.setAttribute("tabindex", "0");
+    c.setAttribute("aria-label", "Lancer " + e.nom);
+    var lancer = function () { noterLance(e.id); app.aller("exercice", { exercice: e }); };
+    c.onclick = lancer;
+    c.onkeydown = function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); lancer(); } };
 
-    var infos = document.createElement("button");
-    infos.className = "infos";
-    infos.style.textAlign = "left";
-    infos.innerHTML = '<div class="nom"></div><div class="detail"></div>';
-    infos.querySelector(".nom").textContent = e.nom;
-    infos.querySelector(".detail").textContent = Modele.resume(e);
-    infos.onclick = function () { app.aller("exercice", { exercice: e }); };
+    var d = Modele.carte(e);
+    c.innerHTML =
+      '<div class="haut">' + apercu(e) + '<div class="icones"></div></div>' +
+      '<span class="mode"><span class="point"></span><span class="texte-mode"></span></span>' +
+      '<h2 class="nom"></h2><div class="details"></div>' +
+      '<div class="pied"><span class="volume"></span><span class="lancer">' + ICONES.jouer + "</span></div>";
+    c.querySelector(".texte-mode").textContent = d.mode;
+    c.querySelector(".nom").textContent = e.nom;
+    c.querySelector(".details").textContent = (d.contenu ? d.contenu + " · " : "") + d.rythme;
+    c.querySelector(".volume").textContent = d.volume;
 
     var crayon = document.createElement("button");
     crayon.className = "icone";
     crayon.setAttribute("aria-label", "Modifier " + e.nom);
-    crayon.textContent = "✎";
-    crayon.onclick = function () { app.aller("reglages", { exercice: e }); };
+    crayon.innerHTML = ICONES.crayon;
+    crayon.onclick = function (ev) { ev.stopPropagation(); app.aller("reglages", { exercice: e }); };
 
     var poubelle = document.createElement("button");
     poubelle.className = "icone";
     poubelle.setAttribute("aria-label", "Supprimer " + e.nom);
-    poubelle.textContent = "🗑";
-    poubelle.onclick = function () {
+    poubelle.innerHTML = ICONES.poubelle;
+    poubelle.onclick = function (ev) {
+      ev.stopPropagation();
       if (confirm("Supprimer « " + e.nom + " » ?")) {
         try {
           app.stockage.supprimer(e.id);
@@ -151,13 +207,14 @@
       }
     };
 
-    c.appendChild(infos); c.appendChild(crayon); c.appendChild(poubelle);
+    var icones = c.querySelector(".icones");
+    icones.appendChild(crayon); icones.appendChild(poubelle);
     return c;
   }
 
   function outils(racine, app) {
     var barre = document.createElement("div");
-    barre.className = "barre-bas";
+    barre.className = "outils-bas";
 
     var exporter = document.createElement("button");
     exporter.className = "bouton fantome";

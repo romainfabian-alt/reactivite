@@ -2,7 +2,7 @@
 // CHAQUE modification d'un fichier listé dans FICHIERS. Sans ça, l'iPad déjà
 // installé continue de servir l'ancienne version indéfiniment, hors ligne
 // comme en ligne, et le kinésithérapeute ne verra jamais les corrections.
-var CACHE = "reactivite-v3";
+var CACHE = "reactivite-v4";
 
 var FICHIERS = [
   "./",
@@ -21,6 +21,7 @@ var FICHIERS = [
   "./src/exercices-livres.js",
   "./src/stockage.js",
   "./src/rendu.js",
+  "./src/legende.js",
   "./src/audio.js",
   "./src/veille.js",
   "./src/ecran-liste.js",

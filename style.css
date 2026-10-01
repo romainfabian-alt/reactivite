@@ -1,10 +1,14 @@
 :root {
-  --fond: #14171A;
-  --carte: #1C1F22;
-  --bordure: #2E3338;
+  /* Refonte du 01/10/2026 : même direction « sombre technique », graphite un
+     peu plus profond, cuivre clair pour les petites capitales. */
+  --fond: #111315;
+  --carte: #1A1D20;
+  --carte-haut: #202428;
+  --bordure: #2A2F35;
   --texte: #F2EFE9;
   --texte-doux: #8B949B;
   --cuivre: #B07D4F;
+  --cuivre-clair: #D3A474;
   --danger: #E0322B;
 }
 
@@ -27,6 +31,45 @@ body { position: fixed; width: 100%; overflow: hidden; }
 .entete { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
 .entete h1 { font-size: 24px; margin: 0; flex: 1; font-weight: 600; }
 .entete img { width: 34px; height: 34px; }
+
+/* Accueil (refonte du 01/10/2026) : une grille de cartes sur toute la largeur
+   de l'iPad en paysage. */
+.page.accueil { max-width: 1240px; padding-left: 32px; padding-right: 32px; }
+.accueil .entete { margin-bottom: 24px; gap: 14px; }
+.accueil .entete img { width: 40px; height: 40px; }
+.accueil .entete h1 { flex: none; font-size: 26px; font-weight: 650; letter-spacing: -.01em; }
+.accueil .entete .compte { color: var(--texte-doux); font-size: 14px; }
+.accueil .entete .espace { flex: 1; }
+.grille-ex { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .grille-ex { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.carte-ex { background: var(--carte); border: 1px solid var(--bordure); border-radius: 18px; padding: 16px 18px;
+  display: flex; flex-direction: column; min-height: 232px; cursor: pointer; }
+.carte-ex:active { background: var(--carte-haut); }
+.carte-ex.recente { border-color: rgba(176,125,79,.55); background: linear-gradient(180deg, #1F1C19, var(--carte)); }
+.carte-ex .haut { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.apercu { width: 72px; height: 72px; flex: none; border-radius: 14px; background: #050606; border: 1px solid #23272b;
+  display: flex; align-items: center; justify-content: center; }
+.apercu svg { display: block; }
+.apercu.quatre { display: grid; grid-template-columns: 22px 22px; grid-template-rows: 22px 22px; gap: 5px;
+  align-content: center; justify-content: center; align-items: stretch; justify-items: stretch; }
+.apercu.quatre span { border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+.carte-ex .icones { display: flex; margin: -8px -10px 0 0; }
+.carte-ex .icone { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--texte-doux); border-radius: 10px; }
+.carte-ex .icone svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round; }
+.carte-ex .mode { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--cuivre-clair); }
+.carte-ex .mode .point { width: 7px; height: 7px; border-radius: 50%; background: var(--cuivre); }
+.carte-ex .nom { margin: 6px 0 4px; font-size: 18px; font-weight: 640; line-height: 1.25; }
+.carte-ex .details { color: var(--texte-doux); font-size: 13px; font-variant-numeric: tabular-nums; }
+.carte-ex .pied { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 14px; }
+.carte-ex .volume { font-size: 14px; font-variant-numeric: tabular-nums; }
+.carte-ex .lancer { width: 48px; height: 48px; border-radius: 50%; background: var(--cuivre);
+  display: flex; align-items: center; justify-content: center; }
+.carte-ex .lancer svg { width: 22px; height: 22px; fill: #16130F; }
+.outils-bas { display: flex; gap: 10px; justify-content: flex-end; padding: 22px 0 max(14px, env(safe-area-inset-bottom)); }
+.outils-bas .bouton { min-height: 44px; padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--texte-doux); }
 
 button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
 
@@ -113,10 +156,27 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 }
 .scene .stimulus { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
 .scene .stimulus svg { max-height: 90vh; max-width: 90vw; }
-.decompte { font-size: 22vh; font-weight: 700; color: var(--texte); }
-.repos { text-align: center; color: var(--texte); }
-.repos .restant { font-size: 18vh; font-weight: 700; line-height: 1; }
-.repos .suite { font-size: 20px; color: var(--texte-doux); margin-top: 12px; }
+.decompte { font-size: 22vh; font-weight: 700; color: var(--texte); font-variant-numeric: tabular-nums; }
+.repos { text-align: center; color: var(--texte); display: flex; flex-direction: column; align-items: center; }
+.repos .restant { font-size: 18vh; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.repos .suite { font-size: 22px; color: var(--texte-doux); margin-bottom: 1.5vh; }
+
+/* Légende pendant le décompte et le repos (refonte du 01/10/2026) : lisible à
+   trois mètres, chaque tuile montre le stimulus tel qu'il apparaîtra. */
+.avant-depart { display: flex; flex-direction: column; align-items: center; gap: 3vh; }
+.avant-depart .decompte { font-size: 15vh; line-height: 1; }
+.legende { display: flex; flex-direction: column; align-items: center; gap: 2.5vh; color: var(--texte); }
+.legende-titre { font-size: 2.4vh; letter-spacing: .14em; text-transform: uppercase; color: var(--texte-doux); }
+.legende-tuiles { display: flex; gap: 5vw; align-items: flex-start; justify-content: center; }
+.tuile-legende { display: flex; flex-direction: column; align-items: center; gap: 1.6vh; }
+.tuile-legende .carre { width: 17vh; height: 17vh; border-radius: 2vh; display: flex; align-items: center; justify-content: center; }
+.tuile-legende .carre.sombre { background: #0B0C0D; border: 2px solid #23272b; }
+.tuile-legende .mot { font-size: 3.6vh; font-weight: 650; }
+.tuile-legende .reponse { width: 5vh; height: 5vh; display: flex; align-items: center; justify-content: center; }
+.legende.compacte { margin-top: 3vh; gap: 1.5vh; }
+.legende.compacte .carre { width: 12vh; height: 12vh; border-radius: 1.6vh; }
+.legende.compacte .mot { font-size: 2.6vh; }
+.legende.compacte .reponse { width: 3.6vh; height: 3.6vh; }
 
 .voile {
   /* Opaque : à la pause, le patient ne doit plus rien avoir à traiter,

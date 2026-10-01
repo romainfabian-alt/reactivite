@@ -44,6 +44,18 @@ temps en temps :
 
 Faites un export après chaque séance de réglage un peu longue.
 
+## L'écran d'accueil et la légende
+
+Chaque exercice est une carte : un aperçu du stimulus, son mode, son nom, son
+rythme et sa durée. Toucher la carte lance l'exercice ; le crayon ouvre ses
+réglages, la poubelle le supprime. Le dernier exercice lancé porte un liseré
+cuivre.
+
+En code couleur, en conflit, en distracteur ou avec un stop, la **légende**
+s'affiche en grand pendant le décompte 3-2-1 et pendant le repos entre deux
+séries : ce que veut dire chaque couleur, avec les mots du patient (avant,
+arrière, gauche, droite). Il n'a plus à retenir une consigne orale.
+
 ## Les six exercices livrés
 
 L'app arrive avec six exercices déjà prêts, qui couvrent les trois modes et

@@ -343,10 +343,10 @@
     });
   }
 
+  // Les mêmes mots que la légende vue par le patient (Avant, Arrière) :
+  // le kiné règle ce que le patient lira.
   function libelleDirection(d) {
-    return { "haut": "Haut", "haut-droite": "Haut droite", "droite": "Droite",
-             "bas-droite": "Bas droite", "bas": "Bas", "bas-gauche": "Bas gauche",
-             "gauche": "Gauche", "haut-gauche": "Haut gauche" }[d];
+    return global.Legende.mot(d);
   }
 
   function pastille(couleur) {

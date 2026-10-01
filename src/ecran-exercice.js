@@ -2,9 +2,37 @@
   var Rendu   = global.Rendu;
   var Moteur  = global.Moteur;
   var Modele  = global.Modele;
+  var Legende = global.Legende;
+
+  // La légende de l'exercice (refonte du 01/10/2026) : en code couleur ou en
+  // conflit, le patient voit ce que veut dire chaque couleur pendant le 3-2-1
+  // et pendant le repos, au lieu de retenir une consigne orale. Chaque tuile
+  // montre le stimulus tel qu'il apparaîtra. Les textes viennent de
+  // legende.js (constantes) ; les couleurs passent par Rendu, qui les valide.
+  function legendeHTML(legende, compacte) {
+    if (!legende) return "";
+    var tuiles = legende.tuiles.map(function (t) {
+      var hex = Rendu.fond(t.couleur), carre, dessous = "";
+      if (t.type === "code") {
+        carre = '<div class="carre" style="background:' + hex + '">' + Rendu.fleche(t.direction, "#FFFFFF", 66) + "</div>";
+      } else if (t.type === "suivre" || t.type === "inverser") {
+        carre = '<div class="carre sombre">' + Rendu.fleche("droite", hex, 66) + "</div>";
+        dessous = '<div class="reponse">' + Rendu.fleche(t.reponse, "#F2EFE9", 100) + "</div>";
+      } else if (t.forme === "couleur") {
+        carre = '<div class="carre" style="background:' + hex + '"></div>';
+      } else {
+        carre = '<div class="carre sombre">' + Rendu.stop(hex, 66) + "</div>";
+      }
+      return '<div class="tuile-legende">' + carre + '<div class="mot">' + t.mot + "</div>" + dessous + "</div>";
+    }).join("");
+    return '<div class="legende' + (compacte ? " compacte" : "") + '">' +
+      (legende.titre ? '<div class="legende-titre">' + legende.titre + "</div>" : "") +
+      (tuiles ? '<div class="legende-tuiles">' + tuiles + "</div>" : "") + "</div>";
+  }
 
   function afficher(racine, app, exercice) {
     var moteur = Moteur.creer(exercice, Date.now() % 100000);
+    var legende = Legende.pour(exercice);
     var scene, zone, voile = null, boucle = null, origine = null, termine = false;
     var idAffiche = null; // identifiant du stimulus actuellement affiché, pour valider les "effacer"
 
@@ -25,7 +53,7 @@
     function appliquer(ev) {
       if (ev.type === "decompte") {
         fondEcran(null);
-        poser('<div class="decompte">' + ev.valeur + "</div>");
+        poser('<div class="avant-depart"><div class="decompte">' + ev.valeur + "</div>" + legendeHTML(legende, false) + "</div>");
         if (exercice.son.bip) app.audio.bip();
         return;
       }
@@ -68,8 +96,8 @@
 
       if (ev.type === "repos") {
         fondEcran(null);
-        poser('<div class="repos"><div class="restant"></div>' +
-              '<div class="suite">Série ' + ev.suivante + " sur " + exercice.series + "</div></div>");
+        poser('<div class="repos"><div class="suite">Série ' + ev.suivante + " sur " + exercice.series + " dans</div>" +
+              '<div class="restant"></div>' + legendeHTML(legende, true) + "</div>");
         return;
       }
 
